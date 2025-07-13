@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UI Anonymous Community</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #eaa306; /* UI Gold */
+        --secondary: #006341; /* UI Green */
+        --bg-dark: #0a0a1a;
+        --bg-light: #121230;
+        --text: #e0e0ff;
+        --card-bg: #1a1a3a;
+        --error: #ff4d4d;
+        --success: #4dff4d;
+        --warning: #ffcc00;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg-dark);
+        color: var(--text);
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Animations */
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+
+      @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+      }
+
+      .header {
+        padding: 0.5rem 1rem;
+        background: var(--bg-light);
+        border-bottom: 1px solid rgba(234, 163, 6, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        animation: slideIn 0.5s ease-out;
+        z-index: 10;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo {
+        height: 40px;
+        margin-right: 10px;
+        animation: pulse 2s infinite;
+      }
+
+      .header h1 {
+        font-size: 1.2rem;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: 1px;
+      }
+
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--primary),
+          transparent
+        );
+      }
+
+      .auth-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      .auth-btn {
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        border: none;
+        color: var(--bg-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+      }
+
+      .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(234, 163, 6, 0.4);
+      }
+
+      .main-container {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .sidebar {
+        width: 250px;
+        background: var(--bg-light);
+        border-right: 1px solid rgba(0, 99, 65, 0.2);
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(234, 163, 6, 0.2);
+      }
+
+      .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+        border: 2px solid var(--primary);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .profile-pic:hover {
+        transform: scale(1.1);
+      }
+
+      .profile-info h3 {
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
+        cursor: pointer;
+      }
+
+      .profile-info p {
+        font-size: 0.7rem;
+        opacity: 0.7;
+      }
+
+      .nav-menu {
+        list-style: none;
+        margin-top: 1rem;
+      }
+
+      .nav-item {
+        padding: 0.75rem 0.5rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .nav-item i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(234, 163, 6, 0.1);
+        color: var(--primary);
+      }
+
+      .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-height: 100vh;
+      }
+
+      .chat-header {
+        padding: 0.75rem 1rem;
+        background: var(--bg-light);
+        border-bottom: 1px solid rgba(0, 99, 65, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chat-title {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+
+      #messages {
+        list-style-type: none;
+        padding: 1rem;
+        overflow-y: auto;
+        flex: 1;
+        scroll-behavior: smooth;
+      }
+
+      #messages li {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 1rem;
+        max-width: 80%;
+        position: relative;
+        word-wrap: break-word;
+        animation: fadeIn 0.3s ease-out;
+        transition: all 0.2s ease;
+      }
+
+      #messages li.user-message {
+        background: rgba(234, 163, 6, 0.1);
+        border: 1px solid rgba(234, 163, 6, 0.3);
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+      }
+
+      #messages li.other-message {
+        background: rgba(0, 99, 65, 0.1);
+        border: 1px solid rgba(0, 99, 65, 0.3);
+        margin-right: auto;
+        border-bottom-left-radius: 0.25rem;
+      }
+
+      #messages li:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      #messages li .sender {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        margin-bottom: 0.25rem;
+        display: block;
+      }
+
+      #messages li .time {
+        font-size: 0.6rem;
+        opacity: 0.5;
+        display: block;
+        text-align: right;
+        margin-top: 0.25rem;
+      }
+
+      #messages li .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: none;
+        border: none;
+        color: var(--error);
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s;
+        font-size: 0.7rem;
+      }
+
+      #messages li:hover .delete-btn {
+        opacity: 1;
+      }
+
+      /* Reply indicator */
+      .reply-indicator {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid var(--primary);
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+
+      .reply-indicator .replying-to {
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      /* Message actions */
+      .message-actions {
+        position: absolute;
+        top: -10px;
+        right: 10px;
+        background: var(--bg-light);
+        border-radius: 1rem;
+        padding: 0.25rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 5;
+      }
+
+      #messages li:hover .message-actions {
+        display: flex;
+      }
+
+      .message-action-btn {
+        background: none;
+        border: none;
+        color: var(--text);
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+        border-radius: 0.5rem;
+      }
+
+      .message-action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Input area */
+      #form {
+        display: flex;
+        padding: 1rem;
+        background: var(--bg-light);
+        border-top: 1px solid rgba(0, 99, 65, 0.2);
+        position: relative;
+      }
+
+      #input-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #reply-preview {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid var(--primary);
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        display: none;
+      }
+
+      #reply-cancel {
+        background: none;
+        border: none;
+        color: var(--error);
+        cursor: pointer;
+        margin-left: 0.5rem;
+      }
+
+      #input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      #input:focus {
+        box-shadow: 0 0 10px rgba(234, 163, 6, 0.5);
+      }
+
+      .input-actions {
+        display: flex;
+        align-items: center;
+        margin-left: 0.5rem;
+      }
+
+      .action-btn {
+        background: none;
+        border: none;
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin: 0 0.25rem;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+      }
+
+      #form button[type="submit"] {
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        border: none;
+        color: var(--bg-dark);
+        padding: 0.75rem 1.5rem;
+        margin-left: 0.5rem;
+        border-radius: 2rem;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      #form button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(234, 163, 6, 0.4);
+      }
+
+      /* Media upload preview */
+      .media-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .media-item {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+
+      .media-item img, .media-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .media-remove {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: var(--error);
+        color: white;
+        border: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        cursor: pointer;
+      }
+
+      /* Voice recording */
+      .voice-recording {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(255, 0, 0, 0.1);
+        border-radius: 2rem;
+        margin-right: 0.5rem;
+        display: none;
+      }
+
+      .recording-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--error);
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        animation: pulse 1.5s infinite;
+      }
+
+      .recording-time {
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+      }
+
+      .stop-recording {
+        background: none;
+        border: none;
+        color: var(--error);
+        cursor: pointer;
+      }
+
+      /* User count */
+      .user-count {
+        text-align: center;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+
+      /* Media modal */
+      .media-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .media-modal-content {
+        max-width: 90%;
+        max-height: 90%;
+      }
+
+      .media-modal-content img, .media-modal-content video {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 0.5rem;
+      }
+
+      .close-media-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(var(--primary), var(--secondary));
+        border-radius: 4px;
+      }
+
+      /* Typing indicator */
+      .typing-indicator {
+        display: flex;
+        padding: 0.5rem 1rem;
+        margin-left: 1rem;
+        align-items: center;
+      }
+
+      .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background: var(--primary);
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+        opacity: 0.4;
+      }
+
+      .typing-indicator span:nth-child(1) {
+        animation: typing 1s infinite;
+      }
+
+      .typing-indicator span:nth-child(2) {
+        animation: typing 1s infinite 0.2s;
+      }
+
+      .typing-indicator span:nth-child(3) {
+        animation: typing 1s infinite 0.4s;
+      }
+
+      @keyframes typing {
+        0% {
+          opacity: 0.4;
+          transform: translateY(0);
+        }
+        50% {
+          opacity: 1;
+          transform: translateY(-5px);
+        }
+        100% {
+          opacity: 0.4;
+          transform: translateY(0);
+        }
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .modal-content {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 400px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text);
+        transition: transform 0.3s ease;
+      }
+
+      .close-modal:hover {
+        transform: rotate(90deg);
+      }
+
+      .modal-title {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--primary);
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid rgba(234, 163, 6, 0.3);
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font-size: 1rem;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 10px rgba(234, 163, 6, 0.3);
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 0.5rem;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: var(--bg-dark);
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(234, 163, 6, 0.4);
+      }
+
+      .error-message {
+        color: var(--error);
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      .success-message {
+        color: var(--success);
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      /* Profile section */
+      .profile-container {
+        display: none;
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+
+      .profile-card {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        animation: slideIn 0.5s ease-out;
+      }
+
+      .profile-card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 3px solid var(--primary);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .profile-card img:hover {
+        transform: scale(1.05);
+      }
+
+      .profile-card h2 {
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+      }
+
+      .profile-card p {
+        opacity: 0.7;
+        margin-bottom: 1rem;
+      }
+
+      .profile-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .profile-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .profile-link i {
+        margin-right: 0.5rem;
+      }
+
+      /* Edit profile modal */
+      .edit-profile-form {
+        margin-top: 1.5rem;
+      }
+
+      /* Developer contact */
+      .developer-contact {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: var(--bg-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite;
+      }
+
+      .developer-contact:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(234, 163, 6, 0.5);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 100;
+          transform: translateX(-100%);
+        }
+        
+        .sidebar.active {
+          transform: translateX(0);
+        }
+        
+        .sidebar-toggle {
+          display: block !important;
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          z-index: 90;
+          background: var(--primary);
+          color: var(--bg-dark);
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2rem;
+          cursor: pointer;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        #messages li {
+          max-width: 90%;
+        }
+        
+        .input-actions {
+          position: fixed;
+          bottom: 5rem;
+          right: 1rem;
+          flex-direction: column;
+          background: var(--bg-light);
+          border-radius: 2rem;
+          padding: 0.5rem;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .action-btn {
+          margin: 0.25rem 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header h1 {
+          font-size: 1rem;
+        }
+        
+        .auth-btn {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.7rem;
+        }
+        
+        #form button[type="submit"] {
+          padding: 0.5rem 1rem;
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Disclaimer Modal -->
+    <div id="disclaimerModal" class="modal">
+      <div class="modal-content disclaimer-content">
+        <h2 class="modal-title">Important Disclaimer</h2>
+        <p>Welcome to the UI Anonymous Community platform. Please read this disclaimer carefully before using our services.</p>
+        
+        <p><strong>Platform Responsibility:</strong> The administrators and developers of this platform are not responsible for any content shared by users. All communications are the sole responsibility of the individuals who post them.</p>
+        
+        <p><strong>User Conduct:</strong> By using this platform, you agree to use it responsibly and lawfully. Any misuse of the platform is strictly at your own risk.</p>
+        
+        <p><strong>Support:</strong> For any issues or support, please join our WhatsApp support channel: 
+          <a href="https://whatsapp.com/channel/0029Vb62mQ8AO7RG52gThm3z" target="_blank">UI Support Channel</a>
+        </p>
+        
+        <p><strong>Privacy:</strong> While we strive to maintain your anonymity, absolute privacy cannot be guaranteed in any online platform.</p>
+        
+        <button class="btn" onclick="closeModal('disclaimerModal')">I Understand</button>
+      </div>
+    </div>
+
+    <!-- Media Modal -->
+    <div class="media-modal" id="mediaModal">
+      <span class="close-media-modal" onclick="closeModal('mediaModal')">&times;</span>
+      <div class="media-modal-content" id="mediaModalContent"></div>
+    </div>
+
+    <!-- Auth Modals -->
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('loginModal')">&times;</span>
+        <h2 class="modal-title">Login</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input
+              type="password"
+              id="loginPassword"
+              class="form-control"
+              required
+            />
+          </div>
+          <div id="loginError" class="error-message"></div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem">
+          Don't have an account?
+          <a
+            href="#"
+            onclick="showRegisterModal()"
+            style="color: var(--primary)"
+            >Register</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('registerModal')"
+          >&times;</span
+        >
+        <h2 class="modal-title">Register</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="registerUsername">Username</label>
+            <input
+              type="text"
+              id="registerUsername"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input
+              type="email"
+              id="registerEmail"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input
+              type="password"
+              id="registerPassword"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="registerProfilePic">Profile Picture</label>
+            <input
+              type="file"
+              id="registerProfilePic"
+              class="form-control"
+              accept="image/*"
+              required
+            />
+          </div>
+          <div id="registerError" class="error-message"></div>
+          <div id="registerSuccess" class="success-message"></div>
+          <button type="submit" class="btn">Register</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('editProfileModal')"
+          >&times;</span
+        >
+        <h2 class="modal-title">Edit Profile</h2>
+        <form id="editProfileForm" class="edit-profile-form">
+          <div class="form-group">
+            <label for="editUsername">Username</label>
+            <input
+              type="text"
+              id="editUsername"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="editProfilePic">Profile Picture</label>
+            <input
+              type="file"
+              id="editProfilePic"
+              class="form-control"
+              accept="image/*"
+            />
+          </div>
+          <div id="editProfileError" class="error-message"></div>
+          <div id="editProfileSuccess" class="success-message"></div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Header -->
+    <div class="header">
+      <div class="logo-container">
+        <img src="./logo.jpg" alt="UI Logo" class="logo" />
+        <h1>UI Anonymous Community</h1>
+      </div>
+      <div class="auth-buttons">
+        <button class="auth-btn" id="loginBtn">Login</button>
+        <button class="auth-btn" id="registerBtn">Register</button>
+      </div>
+    </div>
+
+    <!-- Sidebar Toggle (Mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle" style="display: none;">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar (visible when logged in) -->
+      <div class="sidebar" id="sidebar">
+        <div class="user-profile">
+          <img
+            src="https://via.placeholder.com/50"
+            alt="Profile"
+            class="profile-pic"
+            id="profilePic"
+            onclick="showEditProfileModal()"
+          />
+          <div class="profile-info">
+            <h3 id="usernameDisplay" onclick="showEditProfileModal()">Guest</h3>
+            <p id="userStatus">Not logged in</p>
+          </div>
+        </div>
+
+        <ul class="nav-menu">
+          <li class="nav-item active" data-section="community-chat">
+            <i class="fas fa-comments"></i>
+            <span>Community Chat</span>
+          </li>
+          <li class="nav-item" data-section="profile">
+            <i class="fas fa-user"></i>
+            <span>My Profile</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Community Chat Section -->
+      <div class="chat-container" id="community-chat">
+        <div class="chat-header">
+          <div class="chat-title">Community Chat</div>
+          <div class="user-count" id="userCount">0 users online</div>
+        </div>
+        <ul id="messages"></ul>
+        <div id="typing"></div>
+        <form id="form">
+          <div id="input-container">
+            <div id="reply-preview">
+              <span>Replying to <span class="replying-to" id="replying-to"></span></span>
+              <button id="reply-cancel">&times;</button>
+              <div id="reply-content"></div>
+            </div>
+            <div class="media-preview" id="media-preview"></div>
+            <input
+              id="input"
+              autocomplete="off"
+              placeholder="Type your message..."
+            />
+          </div>
+          <div class="input-actions">
+            <button type="button" class="action-btn" id="mediaBtn" title="Upload media">
+              <i class="fas fa-image"></i>
+            </button>
+            <button type="button" class="action-btn" id="voiceBtn" title="Record voice">
+              <i class="fas fa-microphone"></i>
+            </button>
+          </div>
+          <div class="voice-recording" id="voice-recording">
+            <div class="recording-dot"></div>
+            <span class="recording-time" id="recording-time">00:00</span>
+            <button class="stop-recording" id="stop-recording">
+              <i class="fas fa-stop"></i>
+            </button>
+          </div>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="profile-container" id="profile">
+        <div class="profile-card">
+          <img
+            src="https://via.placeholder.com/100"
+            alt="Profile"
+            id="profileImage"
+            onclick="showEditProfileModal()"
+          />
+          <h2 id="profileUsername" onclick="showEditProfileModal()">Guest</h2>
+          <p id="profileEmail">Not logged in</p>
+          <div class="profile-link" id="copyProfileLink">
+            <i class="fas fa-link"></i>
+            <span>Copy Profile Link</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Developer Contact -->
+    <a
+      href="https://wa.me/2347019706826"
+      class="developer-contact"
+      target="_blank"
+    >
+      <i class="fab fa-whatsapp"></i> Contact Developer
+    </a>
+
+    <!-- Hidden file input for media upload -->
+    <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" multiple>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      let currentUser = null;
+      let replyingTo = null;
+      let mediaFiles = [];
+      let mediaRecorder;
+      let audioChunks = [];
+      let recordingInterval;
+      let recordingSeconds = 0;
+
+      // DOM elements
+      const loginBtn = document.getElementById("loginBtn");
+      const registerBtn = document.getElementById("registerBtn");
+      const loginModal = document.getElementById("loginModal");
+      const registerModal = document.getElementById("registerModal");
+      const editProfileModal = document.getElementById("editProfileModal");
+      const disclaimerModal = document.getElementById("disclaimerModal");
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const editProfileForm = document.getElementById("editProfileForm");
+      const loginError = document.getElementById("loginError");
+      const registerError = document.getElementById("registerError");
+      const registerSuccess = document.getElementById("registerSuccess");
+      const editProfileError = document.getElementById("editProfileError");
+      const editProfileSuccess = document.getElementById("editProfileSuccess");
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+      const profilePic = document.getElementById("profilePic");
+      const usernameDisplay = document.getElementById("usernameDisplay");
+      const userStatus = document.getElementById("userStatus");
+      const navItems = document.querySelectorAll(".nav-item");
+      const sections = {
+        "community-chat": document.getElementById("community-chat"),
+        profile: document.getElementById("profile"),
+      };
+      const profileImage = document.getElementById("profileImage");
+      const profileUsername = document.getElementById("profileUsername");
+      const profileEmail = document.getElementById("profileEmail");
+      const copyProfileLink = document.getElementById("copyProfileLink");
+      const mediaModal = document.getElementById("mediaModal");
+      const mediaModalContent = document.getElementById("mediaModalContent");
+      const fileInput = document.getElementById("fileInput");
+      const mediaBtn = document.getElementById("mediaBtn");
+      const voiceBtn = document.getElementById("voiceBtn");
+      const voiceRecording = document.getElementById("voice-recording");
+      const stopRecording = document.getElementById("stop-recording");
+      const recordingTime = document.getElementById("recording-time");
+      const mediaPreview = document.getElementById("media-preview");
+      const replyPreview = document.getElementById("reply-preview");
+      const replyingToSpan = document.getElementById("replying-to");
+      const replyContent = document.getElementById("reply-content");
+      const replyCancel = document.getElementById("reply-cancel");
+
+      // Chat elements
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+      const typingIndicator = document.getElementById("typing");
+      const userCountElement = document.getElementById("userCount");
+
+      // Show disclaimer modal on first visit
+      if (!localStorage.getItem("disclaimerAccepted")) {
+        setTimeout(() => {
+          disclaimerModal.style.display = "flex";
+        }, 1000);
+      }
+
+      // Accept disclaimer
+      function acceptDisclaimer() {
+        localStorage.setItem("disclaimerAccepted", "true");
+        closeModal("disclaimerModal");
+      }
+
+      // Show login modal
+      loginBtn.addEventListener("click", () => {
+        loginModal.style.display = "flex";
+      });
+
+      // Show register modal
+      registerBtn.addEventListener("click", () => {
+        registerModal.style.display = "flex";
+      });
+
+      // Show edit profile modal
+      function showEditProfileModal() {
+        if (!currentUser) return;
+
+        document.getElementById("editUsername").value = currentUser.username;
+        editProfileModal.style.display = "flex";
+      }
+
+      // Close modal
+      function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+      }
+
+      // Show register modal from login modal
+      function showRegisterModal() {
+        closeModal("loginModal");
+        registerModal.style.display = "flex";
+      }
+
+      // Toggle sidebar on mobile
+      sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+      });
+
+      // Handle login
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        // In a real app, you would send this to your server for authentication
+        // For now, we'll simulate a successful login
+        simulateLogin(email, password);
+      });
+
+      // Simulate login (replace with actual authentication)
+      function simulateLogin(email, password) {
+        // Basic validation
+        if (!email || !password) {
+          loginError.textContent = "Please fill in all fields";
+          loginError.style.display = "block";
+          return;
+        }
+
+        // Check if user exists in localStorage
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const user = users.find(
+          (u) => u.email === email && u.password === password
+        );
+
+        if (!user) {
+          loginError.textContent = "Invalid email or password";
+          loginError.style.display = "block";
+          return;
+        }
+
+        // Set current user
+        currentUser = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          profilePic: user.profilePic,
+        };
+
+        // Update UI
+        updateUserUI();
+        closeModal("loginModal");
+        loginError.style.display = "none";
+
+        // Connect to socket with user data
+        socket.emit("set username", currentUser.username);
+        socket.emit("user connected", currentUser);
+
+        // Load community chat
+        loadCommunityChat();
+      }
+
+      // Handle registration
+      registerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const username = document.getElementById("registerUsername").value;
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
+        const profilePicInput = document.getElementById("registerProfilePic");
+
+        // Basic validation
+        if (!username || !email || !password || !profilePicInput.files[0]) {
+          registerError.textContent = "Please fill in all fields";
+          registerError.style.display = "block";
+          return;
+        }
+
+        // Handle profile picture upload
+        const file = profilePicInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const profilePicUrl = e.target.result;
+
+          // Create user object
+          const user = {
+            id: "user_" + Math.random().toString(36).substr(2, 9),
+            username,
+            email,
+            password, // Note: In production, you should hash passwords
+            profilePic: profilePicUrl,
+          };
+
+          // Save user to localStorage
+          const users = JSON.parse(localStorage.getItem("users")) || [];
+          users.push(user);
+          localStorage.setItem("users", JSON.stringify(users));
+
+          // Show success message
+          registerSuccess.textContent =
+            "Registration successful! You can now login.";
+          registerSuccess.style.display = "block";
+          registerError.style.display = "none";
+
+          // Clear form
+          registerForm.reset();
+
+          // Auto close after 2 seconds
+          setTimeout(() => {
+            closeModal("registerModal");
+            registerSuccess.style.display = "none";
+          }, 2000);
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      // Handle edit profile
+      editProfileForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const newUsername = document.getElementById("editUsername").value;
+        const profilePicInput = document.getElementById("editProfilePic");
+
+        if (!newUsername) {
+          editProfileError.textContent = "Username is required";
+          editProfileError.style.display = "block";
+          return;
+        }
+
+        // Check if profile picture was changed
+        if (profilePicInput.files.length > 0) {
+          const file = profilePicInput.files[0];
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            updateUserProfile(newUsername, e.target.result);
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          updateUserProfile(newUsername, currentUser.profilePic);
+        }
+      });
+
+      // Update user profile
+      function updateUserProfile(newUsername, newProfilePic) {
+        // Update current user
+        currentUser.username = newUsername;
+        currentUser.profilePic = newProfilePic;
+
+        // Update in localStorage
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const userIndex = users.findIndex((u) => u.id === currentUser.id);
+
+        if (userIndex !== -1) {
+          users[userIndex].username = newUsername;
+          users[userIndex].profilePic = newProfilePic;
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        // Update UI
+        updateUserUI();
+
+        // Notify server
+        socket.emit("update profile", currentUser);
+
+        // Show success message
+        editProfileSuccess.textContent = "Profile updated successfully!";
+        editProfileSuccess.style.display = "block";
+        editProfileError.style.display = "none";
+
+        // Close modal after 1 second
+        setTimeout(() => {
+          closeModal("editProfileModal");
+          editProfileSuccess.style.display = "none";
+        }, 1000);
+      }
+
+      // Update UI after login
+      function updateUserUI() {
+        if (currentUser) {
+          // Show sidebar
+          sidebar.style.display = "flex";
+          sidebarToggle.style.display = "block";
+
+          // Update profile info
+          profilePic.src = currentUser.profilePic;
+          usernameDisplay.textContent = currentUser.username;
+          userStatus.textContent = "Online";
+
+          // Update profile section
+          profileImage.src = currentUser.profilePic;
+          profileUsername.textContent = currentUser.username;
+          profileEmail.textContent = currentUser.email;
+
+          // Hide auth buttons
+          loginBtn.style.display = "none";
+          registerBtn.style.display = "none";
+        } else {
+          // Hide sidebar
+          sidebar.style.display = "none";
+          sidebarToggle.style.display = "none";
+
+          // Show auth buttons
+          loginBtn.style.display = "block";
+          registerBtn.style.display = "block";
+        }
+      }
+
+      // Navigation
+      navItems.forEach((item) => {
+        item.addEventListener("click", function () {
+          const section = this.getAttribute("data-section");
+
+          // Set active nav item
+          navItems.forEach((nav) => nav.classList.remove("active"));
+          this.classList.add("active");
+
+          // Hide all sections
+          Object.values(sections).forEach((sec) => {
+            sec.style.display = "none";
+          });
+
+          // Show selected section
+          sections[section].style.display = "flex";
+          
+          // Close sidebar on mobile
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("active");
+          }
+        });
+      });
+
+      // Copy profile link
+      copyProfileLink.addEventListener("click", function () {
+        if (!currentUser) return;
+
+        const profileLink = `${window.location.origin}/to${currentUser.username}`;
+
+        navigator.clipboard.writeText(profileLink).then(() => {
+          const originalText =
+            copyProfileLink.querySelector("span").textContent;
+          copyProfileLink.querySelector("span").textContent = "Link copied!";
+
+          setTimeout(() => {
+            copyProfileLink.querySelector("span").textContent = originalText;
+          }, 2000);
+        });
+      });
+
+      // Media upload
+      mediaBtn.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        // Clear previous previews
+        mediaPreview.innerHTML = "";
+        
+        files.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const mediaItem = document.createElement("div");
+            mediaItem.className = "media-item";
+            
+            if (file.type.startsWith("image/")) {
+              const img = document.createElement("img");
+              img.src = event.target.result;
+              img.onclick = () => showMediaModal(event.target.result, "image");
+              mediaItem.appendChild(img);
+            } else if (file.type.startsWith("video/")) {
+              const video = document.createElement("video");
+              video.src = event.target.result;
+              video.controls = true;
+              video.onclick = (e) => {
+                e.preventDefault();
+                showMediaModal(event.target.result, "video");
+              };
+              mediaItem.appendChild(video);
+            }
+            
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "media-remove";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = (e) => {
+              e.stopPropagation();
+              mediaItem.remove();
+              mediaFiles = mediaFiles.filter(f => f !== file);
+            };
+            
+            mediaItem.appendChild(removeBtn);
+            mediaPreview.appendChild(mediaItem);
+            mediaFiles.push(file);
+          };
+          
+          reader.readAsDataURL(file);
+        });
+      });
+
+      // Show media in modal
+      function showMediaModal(src, type) {
+        mediaModalContent.innerHTML = "";
+        
+        if (type === "image") {
+          const img = document.createElement("img");
+          img.src = src;
+          mediaModalContent.appendChild(img);
+        } else if (type === "video") {
+          const video = document.createElement("video");
+          video.src = src;
+          video.controls = true;
+          video.autoplay = true;
+          mediaModalContent.appendChild(video);
+        }
+        
+        mediaModal.style.display = "flex";
+      }
+
+      // Voice recording
+      voiceBtn.addEventListener("click", startRecording);
+      stopRecording.addEventListener("click", stopRecordingFunc);
+
+      async function startRecording() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          recordingSeconds = 0;
+          
+          mediaRecorder.ondataavailable = (e) => {
+            audioChunks.push(e.data);
+          };
+          
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            // Create audio element for preview
+            const audio = document.createElement("audio");
+            audio.src = audioUrl;
+            audio.controls = true;
+            
+            // Add to media files
+            mediaFiles.push(new File([audioBlob], "recording.wav", { type: "audio/wav" }));
+            
+            // Add to media preview
+            const mediaItem = document.createElement("div");
+            mediaItem.className = "media-item";
+            mediaItem.appendChild(audio);
+            
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "media-remove";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = (e) => {
+              e.stopPropagation();
+              mediaItem.remove();
+              mediaFiles = mediaFiles.filter(f => f.name !== "recording.wav");
+            };
+            
+            mediaItem.appendChild(removeBtn);
+            mediaPreview.appendChild(mediaItem);
+          };
+          
+          mediaRecorder.start();
+          voiceRecording.style.display = "flex";
+          
+          // Update recording time
+          recordingInterval = setInterval(() => {
+            recordingSeconds++;
+            const minutes = Math.floor(recordingSeconds / 60).toString().padStart(2, "0");
+            const seconds = (recordingSeconds % 60).toString().padStart(2, "0");
+            recordingTime.textContent = `${minutes}:${seconds}`;
+          }, 1000);
+        } catch (err) {
+          console.error("Error recording:", err);
+          alert("Could not access microphone. Please check permissions.");
+        }
+      }
+
+      function stopRecordingFunc() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+          clearInterval(recordingInterval);
+          voiceRecording.style.display = "none";
+          
+          // Stop all tracks
+          mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
+      }
+
+      // Reply to message
+      function setupReply(messageId, username, content) {
+        replyingTo = messageId;
+        replyingToSpan.textContent = username;
+        replyContent.textContent = content.length > 50 ? content.substring(0, 50) + "..." : content;
+        replyPreview.style.display = "block";
+        input.focus();
+      }
+
+      // Cancel reply
+      replyCancel.addEventListener("click", (e) => {
+        e.preventDefault();
+        replyingTo = null;
+        replyPreview.style.display = "none";
+      });
+
+      // Community chat message submission
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if ((input.value.trim() || mediaFiles.length > 0) && currentUser) {
+          const message = input.value.trim();
+          const timestamp = new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          // Create message object
+          const messageObj = {
+            text: message,
+            sender: currentUser.username,
+            time: timestamp,
+            userId: currentUser.id,
+            profilePic: currentUser.profilePic,
+            replyTo: replyingTo,
+            media: []
+          };
+
+          // Process media files
+          if (mediaFiles.length > 0) {
+            mediaFiles.forEach(file => {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                messageObj.media.push({
+                  type: file.type.startsWith("image/") ? "image" : 
+                        file.type.startsWith("video/") ? "video" : "audio",
+                  data: event.target.result
+                });
+              };
+              reader.readAsDataURL(file);
+            });
+          }
+
+          // Emit to server
+          socket.emit("chat message", messageObj);
+
+          // Clear input and reset
+          input.value = "";
+          mediaFiles = [];
+          mediaPreview.innerHTML = "";
+          replyingTo = null;
+          replyPreview.style.display = "none";
+        }
+      });
+
+      // Typing indicator for community chat
+      let typingTimeout;
+      input.addEventListener("input", function () {
+        if (currentUser) {
+          socket.emit("typing");
+
+          if (typingTimeout) clearTimeout(typingTimeout);
+
+          typingTimeout = setTimeout(() => {
+            socket.emit("stop typing");
+          }, 2000);
+        }
+      });
+
+      // Load community chat
+      function loadCommunityChat() {
+        messages.innerHTML =
+          '<li style="text-align: center; padding: 2rem; opacity: 0.7;">Welcome to the UI Anonymous Community Chat!</li>';
+      }
+
+      // Create message element
+      function createMessageElement(data, isCurrentUser) {
+        const item = document.createElement("li");
+        item.className = isCurrentUser ? "user-message" : "other-message";
+        item.setAttribute("data-message-id", data.id || Date.now());
+
+        // Message header (sender info)
+        let messageHtml = `
+          <span class="sender">${data.sender}</span>
+        `;
+
+        // Reply indicator if this is a reply
+        if (data.replyTo) {
+          const repliedMessage = document.querySelector(`[data-message-id="${data.replyTo}"]`);
+          if (repliedMessage) {
+            const repliedContent = repliedMessage.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim();
+            const repliedSender = repliedMessage.querySelector(".sender")?.textContent || "Unknown";
+            
+            messageHtml += `
+              <div class="reply-indicator">
+                Replying to <span class="replying-to">${repliedSender}</span>
+                <div>${repliedContent.length > 50 ? repliedContent.substring(0, 50) + "..." : repliedContent}</div>
+              </div>
+            `;
+          }
+        }
+
+        // Media content
+        if (data.media && data.media.length > 0) {
+          data.media.forEach(media => {
+            if (media.type === "image") {
+              messageHtml += `
+                <img src="${media.data}" style="max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; cursor: pointer;" 
+                  onclick="showMediaModal('${media.data}', 'image')">
+              `;
+            } else if (media.type === "video") {
+              messageHtml += `
+                <video src="${media.data}" controls style="max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0;"></video>
+              `;
+            } else if (media.type === "audio") {
+              messageHtml += `
+                <audio src="${media.data}" controls style="width: 100%; margin: 0.5rem 0;"></audio>
+              `;
+            }
+          });
+        }
+
+        // Text content
+        if (data.text) {
+          messageHtml += data.text;
+        }
+
+        // Message footer (time and actions)
+        messageHtml += `
+          <span class="time">${data.time}</span>
+          <div class="message-actions">
+            <button class="message-action-btn" onclick="setupReply('${data.id || Date.now()}', '${data.sender}', '${data.text || "Media"}')">
+              <i class="fas fa-reply"></i>
+            </button>
+            ${isCurrentUser ? `
+              <button class="message-action-btn" onclick="deleteMessage('${data.id || Date.now()}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            ` : ''}
+          </div>
+        `;
+
+        item.innerHTML = messageHtml;
+        return item;
+      }
+
+      // Delete message
+      function deleteMessage(messageId) {
+        // In a real app, you would notify the server to delete this message
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+          messageElement.remove();
+        }
+      }
+
+      // Receive community messages
+      socket.on("chat message", function (data) {
+        const isCurrentUser = data.userId === currentUser?.id;
+        const item = createMessageElement(data, isCurrentUser);
+
+        // Clear welcome message if it's the first message
+        if (
+          messages.children.length === 1 &&
+          messages.children[0].textContent.includes("Welcome")
+        ) {
+          messages.innerHTML = "";
+        }
+
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+
+        // Remove typing indicator if present
+        const typingElements = document.querySelectorAll(".typing-indicator");
+        typingElements.forEach((el) => el.remove());
+      });
+
+      // User is typing in community chat
+      socket.on("user typing", function (username) {
+        if (username !== currentUser?.username) {
+          const existing = document.querySelectorAll(".typing-indicator");
+          existing.forEach((el) => el.remove());
+
+          const indicator = document.createElement("div");
+          indicator.className = "typing-indicator";
+          indicator.innerHTML = `
+          <span></span>
+          <span></span>
+          <span></span>
+          <span>${username} is typing...</span>
+        `;
+
+          typingIndicator.appendChild(indicator);
+          messages.scrollTop = messages.scrollHeight;
+        }
+      });
+
+      // User stopped typing in community chat
+      socket.on("user stopped typing", function () {
+        const indicators = document.querySelectorAll(".typing-indicator");
+        indicators.forEach((el) => el.remove());
+      });
+
+      // User joined/left notifications
+      socket.on("user joined", function (username) {
+        const item = document.createElement("li");
+        item.style.textAlign = "center";
+        item.style.color = "var(--primary)";
+        item.style.fontSize = "0.8rem";
+        item.style.padding = "0.5rem";
+        item.textContent = `${username} joined the chat`;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+      });
+
+      socket.on("user left", function (username) {
+        const item = document.createElement("li");
+        item.style.textAlign = "center";
+        item.style.color = "var(--secondary)";
+        item.style.fontSize = "0.8rem";
+        item.style.padding = "0.5rem";
+        item.textContent = `${username} left the chat`;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+      });
+
+      // Profile updated
+      socket.on("profile updated", function (userData) {
+        if (currentUser && userData.id === currentUser.id) {
+          currentUser = userData;
+          updateUserUI();
+        }
+      });
+
+      // Update user count
+      socket.on("user count", function (count) {
+        userCountElement.textContent = `${count} user${
+          count !== 1 ? "s" : ""
+        } online`;
+      });
+
+      // Focus input on page load
+      window.addEventListener("load", function () {
+        if (currentUser) {
+          input.focus();
+        }
+
+        // Check if we're viewing a profile link (e.g., /toUsername)
+        const path = window.location.pathname;
+        if (path.startsWith("/to")) {
+          const username = path.substring(3);
+          showProfileByUsername(username);
+        }
+      });
+
+      function showProfileByUsername(username) {
+        // In a real app, you would fetch this from the server
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const user = users.find((u) => u.username === username);
+
+        if (user) {
+          // Show profile section
+          navItems.forEach((nav) => nav.classList.remove("active"));
+          document
+            .querySelector('.nav-item[data-section="profile"]')
+            .classList.add("active");
+
+          // Hide all sections
+          Object.values(sections).forEach((sec) => {
+            sec.style.display = "none";
+          });
+
+          // Show profile
+          sections["profile"].style.display = "flex";
+          loadProfile(user.id);
+        }
+      }
+
+      function loadProfile(userId) {
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const user = users.find((u) => u.id === userId);
+
+        if (user) {
+          profileImage.src = user.profilePic;
+          profileUsername.textContent = user.username;
+          profileEmail.textContent = user.email;
+        }
+      }
+
+      // Initialize UI
+      updateUserUI();
+
+      // Expose functions to global scope for HTML onclick handlers
+      window.showMediaModal = showMediaModal;
+      window.closeModal = closeModal;
+      window.showEditProfileModal = showEditProfileModal;
+      window.setupReply = setupReply;
+      window.deleteMessage = deleteMessage;
+    </script>
+  </body>
+</html>
