@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Anonymous Community</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#eaa306">
+    <meta name="description" content="Anonymous messaging community for University of Ibadan students">
+    <meta name="keywords" content="UI, University of Ibadan, anonymous messaging, student community">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">🎓</div>
+            <h1>UI Anonymous Community</h1>
+        </div>
+        <div class="header-actions">
+            <div class="connection-status" id="connectionStatus">
+                <i class="fas fa-circle"></i>
+                <span>Connecting...</span>
+            </div>
+            <div class="user-count">
+                <i class="fas fa-users"></i>
+                <span id="userCount">0</span> online
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <div class="user-profile" id="userProfile" style="display: none;">
+                <img src="https://via.placeholder.com/50x50/eaa306/0a0a1a?text=U" alt="Profile" class="profile-pic" id="profilePic">
+                <div class="profile-info">
+                    <h3 id="profileName">Guest User</h3>
+                    <p id="profileStatus">Online</p>
+                </div>
+            </div>
+
+            <div class="profile-actions" id="profileActions" style="display: none;">
+                <button class="action-btn" id="shareProfileBtn">
+                    <i class="fas fa-share-alt"></i> Share Profile
+                </button>
+                <button class="action-btn" id="editProfileBtn">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button class="action-btn" id="copyProfileBtn">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item active" data-view="community">
+                    <div class="nav-content">
+                        <i class="fas fa-comments"></i>
+                        <span>Community Chat</span>
+                    </div>
+                </div>
+                <div class="nav-item" data-view="inbox">
+                    <div class="nav-content">
+                        <i class="fas fa-inbox"></i>
+                        <span>Inbox</span>
+                    </div>
+                    <span class="inbox-count" id="inboxCount" style="display: none;">0</span>
+                </div>
+                <div class="nav-item" data-view="anonymous">
+                    <div class="nav-content">
+                        <i class="fas fa-user-secret"></i>
+                        <span>Send Anonymous</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="app-info">
+                    <p class="app-version">v1.2.0</p>
+                    <p class="school-info">University of Ibadan</p>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat">
+                        <i class="fas fa-comments"></i>
+                        <span id="messageCount">0</span> messages
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <!-- Community Chat View -->
+            <div class="chat-view" id="communityView">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <i class="fas fa-comments"></i>
+                        Community Chat
+                    </div>
+                    <div class="chat-actions">
+                        <div class="typing-indicator" id="typingIndicator"></div>
+                        <button class="action-btn" id="clearChatBtn" title="Clear Chat">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn" id="refreshChatBtn" title="Refresh Chat">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <ul id="messages" class="messages-container">
+                    <div class="welcome-message">
+                        <i class="fas fa-comments"></i>
+                        <h3>Welcome to UI Anonymous Community</h3>
+                        <p>Connect with fellow students anonymously. Share your thoughts, ask questions, or just chat!</p>
+                    </div>
+                </ul>
+
+                <form id="form" class="message-form">
+                    <div id="input-container">
+                        <div class="media-preview" id="mediaPreview"></div>
+                        <input id="input" placeholder="Type your message..." autocomplete="off" maxlength="1000">
+                        <div class="input-counter">
+                            <span id="inputCounter">0</span>/1000
+                        </div>
+                    </div>
+                    <div class="input-actions">
+                        <button type="button" class="action-btn" id="mediaBtn" title="Upload Media">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button type="button" class="action-btn" id="emojiBtn" title="Add Emoji">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <button type="submit" class="send-btn" title="Send Message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Inbox View -->
+            <div class="chat-view" id="inboxView" style="display: none;">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <i class="fas fa-inbox"></i>
+                        Inbox
+                        <span class="inbox-badge" id="inboxBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="action-btn" id="refreshInboxBtn" title="Refresh Inbox">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button class="action-btn" id="clearInboxBtn" title="Clear Inbox">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn" id="markAllReadBtn" title="Mark All Read">
+                            <i class="fas fa-check-double"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <ul id="inboxMessages" class="messages-container"></ul>
+
+                <div class="empty-state" id="emptyInbox">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No messages yet</h3>
+                    <p>Anonymous messages will appear here when someone sends you one.</p>
+                    <div class="empty-actions">
+                        <button class="action-btn" onclick="switchView('anonymous')">
+                            <i class="fas fa-user-secret"></i>
+                            Send Anonymous Message
+                        </button>
+                        <button class="action-btn" onclick="showShareModal()">
+                            <i class="fas fa-share-alt"></i>
+                            Share Your Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anonymous Message View -->
+            <div class="chat-view" id="anonymousView" style="display: none;">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <i class="fas fa-user-secret"></i>
+                        Send Anonymous Message
+                    </div>
+                    <div class="chat-actions">
+                        <button class="action-btn" id="helpBtn" title="Help">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        <button class="action-btn" id="pasteBtn" title="Paste from Clipboard">
+                            <i class="fas fa-paste"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="anonymous-container">
+                    <div class="anonymous-form">
+                        <div class="form-group">
+                            <label for="profileUrlInput">
+                                <i class="fas fa-link"></i>
+                                Profile URL or Username
+                            </label>
+                            <input type="text" id="profileUrlInput" placeholder="Enter profile URL or paste link here">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                Paste a profile link like: <code>/to/username-abc123</code> or just the profile ID
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="anonymousMessage">
+                                <i class="fas fa-message"></i>
+                                Anonymous Message
+                            </label>
+                            <textarea id="anonymousMessage" rows="5" placeholder="Type your anonymous message here..." maxlength="1000"></textarea>
+                            <div class="char-count">
+                                <span id="charCount">0</span>/1000
+                            </div>
+                        </div>
+                        <button type="button" id="sendAnonymousBtn" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Anonymous Message
+                        </button>
+                    </div>
+
+                    <div class="anonymous-info">
+                        <h3><i class="fas fa-info-circle"></i> How to send anonymous messages:</h3>
+                        <ol>
+                            <li><strong>Get a profile link:</strong> Ask someone to share their profile link or find it when they share it in chat</li>
+                            <li><strong>Paste the link:</strong> Copy and paste the full link or just the profile ID part</li>
+                            <li><strong>Write your message:</strong> Type your anonymous message (max 1000 characters)</li>
+                            <li><strong>Send:</strong> Click send - the recipient will see it in their inbox</li>
+                        </ol>
+                        
+                        <div class="privacy-note">
+                            <i class="fas fa-shield-alt"></i>
+                            <strong>Privacy Guarantee:</strong> Your identity is completely anonymous. Recipients cannot see who sent the message.
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4><i class="fas fa-example"></i> Example profile links:</h4>
+                            <ul>
+                                <li><code>https://site.com/to/john-abc123def</code></li>
+                                <li><code>/to/jane-xyz789ghi</code></li>
+                                <li><code>john-abc123def</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Setup Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to UI Anonymous Community</h2>
+                <p>Join the conversation and connect with fellow students</p>
+            </div>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <input type="text" id="username" required placeholder="Enter your username" maxlength="30" minlength="3">
+                    <small>Choose a unique username (3-30 characters)</small>
+                </div>
+                <div class="form-group">
+                    <label for="profilePicUpload">
+                        <i class="fas fa-image"></i>
+                        Profile Picture (optional)
+                    </label>
+                    <input type="file" id="profilePicUpload" accept="image/*">
+                    <div class="profile-preview">
+                        <img id="profilePreview" src="https://via.placeholder.com/100x100/eaa306/0a0a1a?text=U" alt="Profile Preview">
+                    </div>
+                    <small>Maximum file size: 10MB</small>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Join Community
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Profile Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Share Your Profile</h2>
+                <p>Share this link for others to send you anonymous messages</p>
+            </div>
+            <div class="share-options">
+                <div class="share-link">
+                    <input type="text" id="shareLink" readonly placeholder="Loading profile link...">
+                    <button type="button" id="copyLinkBtn">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="share-buttons">
+                    <button type="button" class="share-btn" id="shareWhatsAppBtn">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </button>
+                    <button type="button" class="share-btn" id="shareTwitterBtn">
+                        <i class="fab fa-twitter"></i>
+                        Twitter
+                    </button>
+                    <button type="button" class="share-btn" id="shareFacebookBtn">
+                        <i class="fab fa-facebook"></i>
+                        Facebook
+                    </button>
+                    <button type="button" class="share-btn" id="shareInstagramBtn">
+                        <i class="fab fa-instagram"></i>
+                        Instagram
+                    </button>
+                </div>
+            </div>
+            <div class="share-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Important:</strong> Your profile link only works while you're online. Share it when you're active to receive messages.
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="close-btn" onclick="closeShareModal()">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Connecting to UI Anonymous Community...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Hidden file input for media -->
+    <input type="file" id="mediaFileInput" style="display: none;" accept="image/*,video/*" multiple>
+
+    <!-- Emoji Picker -->
+    <div class="emoji-picker" id="emojiPicker" style="display: none;">
+        <div class="emoji-grid">
+            <span class="emoji" data-emoji="😀">😀</span>
+            <span class="emoji" data-emoji="😃">😃</span>
+            <span class="emoji" data-emoji="😄">😄</span>
+            <span class="emoji" data-emoji="😁">😁</span>
+            <span class="emoji" data-emoji="😊">😊</span>
+            <span class="emoji" data-emoji="😉">😉</span>
+            <span class="emoji" data-emoji="😌">😌</span>
+            <span class="emoji" data-emoji="😍">😍</span>
+            <span class="emoji" data-emoji="😘">😘</span>
+            <span class="emoji" data-emoji="😗">😗</span>
+            <span class="emoji" data-emoji="😙">😙</span>
+            <span class="emoji" data-emoji="😚">😚</span>
+            <span class="emoji" data-emoji="😎">😎</span>
+            <span class="emoji" data-emoji="😏">😏</span>
+            <span class="emoji" data-emoji="😒">😒</span>
+            <span class="emoji" data-emoji="😞">😞</span>
+            <span class="emoji" data-emoji="😔">😔</span>
+            <span class="emoji" data-emoji="😟">😟</span>
+            <span class="emoji" data-emoji="😕">😕</span>
+            <span class="emoji" data-emoji="🙁">🙁</span>
+            <span class="emoji" data-emoji="😣">😣</span>
+            <span class="emoji" data-emoji="😖">😖</span>
+            <span class="emoji" data-emoji="😫">😫</span>
+            <span class="emoji" data-emoji="😩">😩</span>
+            <span class="emoji" data-emoji="😢">😢</span>
+            <span class="emoji" data-emoji="😭">😭</span>
+            <span class="emoji" data-emoji="😤">😤</span>
+            <span class="emoji" data-emoji="😠">😠</span>
+            <span class="emoji" data-emoji="😡">😡</span>
+            <span class="emoji" data-emoji="🤔">🤔</span>
+            <span class="emoji" data-emoji="🤗">🤗</span>
+            <span class="emoji" data-emoji="🤐">🤐</span>
+            <span class="emoji" data-emoji="🤨">🤨</span>
+            <span class="emoji" data-emoji="😐">😐</span>
+            <span class="emoji" data-emoji="😑">😑</span>
+            <span class="emoji" data-emoji="😶">😶</span>
+            <span class="emoji" data-emoji="🙄">🙄</span>
+            <span class="emoji" data-emoji="😴">😴</span>
+            <span class="emoji" data-emoji="🤤">🤤</span>
+            <span class="emoji" data-emoji="😪">😪</span>
+            <span class="emoji" data-emoji="😵">😵</span>
+            <span class="emoji" data-emoji="🤪">🤪</span>
+            <span class="emoji" data-emoji="😜">😜</span>
+            <span class="emoji" data-emoji="😝">😝</span>
+            <span class="emoji" data-emoji="🤓">🤓</span>
+            <span class="emoji" data-emoji="🧐">🧐</span>
+            <span class="emoji" data-emoji="🤩">🤩</span>
+            <span class="emoji" data-emoji="🥳">🥳</span>
+            <span class="emoji" data-emoji="😱">😱</span>
+            <span class="emoji" data-emoji="😨">😨</span>
+            <span class="emoji" data-emoji="😰">😰</span>
+            <span class="emoji" data-emoji="😥">😥</span>
+            <span class="emoji" data-emoji="😓">😓</span>
+            <span class="emoji" data-emoji="🤒">🤒</span>
+            <span class="emoji" data-emoji="🤕">🤕</span>
+            <span class="emoji" data-emoji="🤢">🤢</span>
+            <span class="emoji" data-emoji="🤮">🤮</span>
+            <span class="emoji" data-emoji="🤧">🤧</span>
+            <span class="emoji" data-emoji="😇">😇</span>
+            <span class="emoji" data-emoji="🤠">🤠</span>
+            <span class="emoji" data-emoji="🥵">🥵</span>
+            <span class="emoji" data-emoji="🥶">🥶</span>
+            <span class="emoji" data-emoji="🥴">🥴</span>
+            <span class="emoji" data-emoji="😵">😵</span>
+            <span class="emoji" data-emoji="🤯">🤯</span>
+            <span class="emoji" data-emoji="🤠">🤠</span>
+            <span class="emoji" data-emoji="🥳">🥳</span>
+            <span class="emoji" data-emoji="🥺">🥺</span>
+            <span class="emoji" data-emoji="👍">👍</span>
+            <span class="emoji" data-emoji="👎">👎</span>
+            <span class="emoji" data-emoji="👌">👌</span>
+            <span class="emoji" data-emoji="✌️">✌️</span>
+            <span class="emoji" data-emoji="🤞">🤞</span>
+            <span class="emoji" data-emoji="🤟">🤟</span>
+            <span class="emoji" data-emoji="🤘">🤘</span>
+            <span class="emoji" data-emoji="🤙">🤙</span>
+            <span class="emoji" data-emoji="👈">👈</span>
+            <span class="emoji" data-emoji="👉">👉</span>
+            <span class="emoji" data-emoji="👆">👆</span>
+            <span class="emoji" data-emoji="👇">👇</span>
+            <span class="emoji" data-emoji="☝️">☝️</span>
+            <span class="emoji" data-emoji="✋">✋</span>
+            <span class="emoji" data-emoji="🤚">🤚</span>
+            <span class="emoji" data-emoji="🖐">🖐</span>
+            <span class="emoji" data-emoji="🖖">🖖</span>
+            <span class="emoji" data-emoji="👋">👋</span>
+            <span class="emoji" data-emoji="🤝">🤝</span>
+            <span class="emoji" data-emoji="👏">👏</span>
+            <span class="emoji" data-emoji="🙌">🙌</span>
+            <span class="emoji" data-emoji="🤲">🤲</span>
+            <span class="emoji" data-emoji="🙏">🙏</span>
+            <span class="emoji" data-emoji="✍️">✍️</span>
+            <span class="emoji" data-emoji="💪">💪</span>
+            <span class="emoji" data-emoji="🦾">🦾</span>
+            <span class="emoji" data-emoji="🦿">🦿</span>
+            <span class="emoji" data-emoji="🦵">🦵</span>
+            <span class="emoji" data-emoji="🦶">🦶</span>
+            <span class="emoji" data-emoji="👂">👂</span>
+            <span class="emoji" data-emoji="🦻">🦻</span>
+            <span class="emoji" data-emoji="👃">👃</span>
+            <span class="emoji" data-emoji="🧠">🧠</span>
+            <span class="emoji" data-emoji="🫀">🫀</span>
+            <span class="emoji" data-emoji="🫁">🫁</span>
+            <span class="emoji" data-emoji="🦷">🦷</span>
+            <span class="emoji" data-emoji="🦴">🦴</span>
+            <span class="emoji" data-emoji="👀">👀</span>
+            <span class="emoji" data-emoji="👁">👁</span>
+            <span class="emoji" data-emoji="👅">👅</span>
+            <span class="emoji" data-emoji="👄">👄</span>
+            <span class="emoji" data-emoji="💋">💋</span>
+            <span class="emoji" data-emoji="🩸">🩸</span>
+            <span class="emoji" data-emoji="💎">💎</span>
+            <span class="emoji" data-emoji="💍">💍</span>
+            <span class="emoji" data-emoji="💄">💄</span>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
